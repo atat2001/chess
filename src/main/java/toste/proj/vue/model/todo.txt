@@ -1,0 +1,31 @@
+test all pieces -d
+add check verification
+    maybe add first possible moves for each piece
+
+check if its working with all pieces
+
+add castling
+test with real game
+
+
+add ui
+
+
+
+all pieces test- working
+
+e2e4
+d7d5
+
+f1b5
+d5e4
+
+g1f3
+d8d7
+
+b1c3
+d7b5
+
+a1b1
+e8d8
+
