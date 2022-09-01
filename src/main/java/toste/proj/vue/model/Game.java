@@ -12,6 +12,8 @@ public class Game {
     private King kingW;
     private King kingB;
 
+    private int savedMove = 0;
+
     private boolean whiteTurn = true;
     public Game(){
         board = new Board();
@@ -56,7 +58,22 @@ public class Game {
         System.out.println("is king white in check?");
         System.out.println(kingW.isCheck());
         System.out.println("\n");
+    }
+    public void move(int x1, int y1, int x2, int y2){
+        int[] from = new int[]{x1,y1};
+        int[] to = new int[]{x2,y2};
+        /*System.out.println(from[0]);
+        System.out.println(from[1]);
+        System.out.println(to[0]);
+        System.out.println(to[1]);*/
 
+        if(board.move(from, to, whiteTurn))
+            whiteTurn = !whiteTurn;
+        System.out.println("is king black in check?");
+        System.out.println(kingB.isCheck());
+        System.out.println("is king white in check?");
+        System.out.println(kingW.isCheck());
+        System.out.println("\n");
     }
 
     public int[][] toPos(String move){
@@ -170,6 +187,15 @@ public class Game {
         }
         return aux;
 
+    }
+
+    public void saveMove(int move){
+        if(savedMove == 0)
+            savedMove = move;
+        else {
+            move(savedMove / 10, savedMove % 10, move / 10, move % 10);
+            savedMove = 0;
+        }
     }
 
     public String toString(){

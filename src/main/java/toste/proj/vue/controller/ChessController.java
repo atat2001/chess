@@ -14,8 +14,10 @@ public class ChessController{
     }
 
     @PutMapping("/move/{move}")
-    public int move(@PathVariable String move){/*
+    public int move(@PathVariable String move){
         int moveInt = Integer.parseInt(move);
+        game.saveMove((int)moveInt);
+        /*
         int diferenceX = Math.abs((moveInt%10) - (game.getObjective()%10));
         int diferenceY = Math.abs(((moveInt/10) - (game.getObjective()/10)));
         System.out.println(diferenceX);
@@ -25,6 +27,6 @@ public class ChessController{
             return 100;
         }
         return diferenceY+diferenceX;*/
-        return 1;
+        return moveInt;
     }
 }

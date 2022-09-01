@@ -9,6 +9,7 @@ public class Board {
     private List<Piece> pieceList = new ArrayList<Piece>(64);
     private King kingW;
     private King kingB;
+
     public Board() {
         for(int i = 0;i<64; i++)
             pieceList.add(null);
@@ -42,15 +43,15 @@ public class Board {
             pieceList.set(convertIndex(to), pieceList.get(convertIndex(from)));
             pieceList.get(convertIndex(to)).setPosition(to);
             if(checkCheck(isWhite)){
-                pieceList.set(convertIndex(to), toBackup);
-                pieceList.get(convertIndex(to)).setPosition(to);
                 pieceList.set(convertIndex(from), fromBackup);
-                pieceList.get(convertIndex(from)).setPosition(from);
+                fromBackup.setPosition(from);
+                pieceList.set(convertIndex(to), toBackup);
                 System.out.println("move not possible2");
                 return false;
             }
             pieceList.set(convertIndex(from), fromBackup);
             pieceList.set(convertIndex(to), toBackup);
+            fromBackup.setPosition(from);
             return true;
         }
         else{
