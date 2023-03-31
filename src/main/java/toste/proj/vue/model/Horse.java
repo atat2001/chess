@@ -36,5 +36,8 @@ public class Horse extends Piece{
                 " h " +
                 '}';
     }
-
+    @Override
+    public char type(){
+        return 'N';
+    }
 }

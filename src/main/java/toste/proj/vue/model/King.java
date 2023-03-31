@@ -10,14 +10,26 @@ public class King extends Piece {
 
     @Override
     public boolean move(int[] to, boolean isWhite){
+        boolean debug = true;
         if(this.isWhite != isWhite){
             return false;
         }
         int x = to[0] - this.position[0];
         int y = to[1] - this.position[1];
-        if(x > 1 || x < -1 || y > 1 || y < -1)
-            return false;
-        return true;
+        if(!(x > 1 || x < -1 || y > 1 || y < -1))
+            return true;
+        boolean[] aux = board.castleRights(isWhite);
+        if(to[0] == this.position[0] + 2 && aux[1]){
+            if(debug)
+                System.out.println("king move 1");
+            return board.move(new int[]{8, this.position[1]}, new int[]{this.position[0]+1, this.position[1]},this.isWhite);
+        }
+        if(to[0] == this.position[0] - 2 && aux[0]){
+            if(debug)
+                System.out.println("king move 2");
+            return board.move(new int[]{1, this.position[1]}, new int[]{this.position[0]-1, this.position[1]},this.isWhite);
+        }
+        return false;
     }
 
     public boolean horseCheck(){
@@ -148,6 +160,8 @@ public class King extends Piece {
     }
 
 
+
+
     @Override
     public String toString() {
         return "Piece{" +
@@ -156,4 +170,10 @@ public class King extends Piece {
                 " k " +
                 '}';
     }
+
+    @Override
+    public char type(){
+        return 'K';
+    }
+
 }

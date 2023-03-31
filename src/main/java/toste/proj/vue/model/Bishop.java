@@ -55,5 +55,9 @@ public class Bishop extends Piece{
                 " b " +
                 '}';
     }
+    @Override
+    public char type(){
+        return 'B';
+    }
 
 }

@@ -130,7 +130,9 @@ public class Piece {
         return true;
     }
 
-
+    public char type(){
+        return 'p';
+    }
 
     @Override
     public String toString() {

@@ -24,7 +24,7 @@ public class Pawn extends Piece{
         if(this.isWhite() && from[1] == 2){
             if(to[0] == from[0] && 4 == to[1]){
                 // check if square is empty
-                if(board.checkPosition(to) || board.checkPosition(new int[]{3,to[1]})){
+                if(board.checkPosition(to) || board.checkPosition(new int[]{to[0],to[1]-1})){
                     return false;
                 }
                 //this.position = to;
@@ -34,7 +34,7 @@ public class Pawn extends Piece{
         else if(!this.isWhite() && from[1] == 7) {
             if (to[0] == from[0] && 5 == to[1]) {
                 // check if square is empty
-                if(board.checkPosition(to) || board.checkPosition(new int[]{6,to[1]})){
+                if(board.checkPosition(to) || board.checkPosition(new int[]{to[0],to[1]+1})){
                     return false;
                 }
                 //this.position = to;
@@ -61,6 +61,9 @@ public class Pawn extends Piece{
                         //this.position = to;
                         return true;
                     }
+                if(board.getEnPassant() != null && board.getEnPassant().position[0] == to[0] && board.getEnPassant().position[1] == to[1] - 1){
+                    return true;
+                }
                 return false;
             }
         }
@@ -75,6 +78,7 @@ public class Pawn extends Piece{
                 //this.position = to;
                 return true;
             }
+            // capture
             if(from[1] == to[1] + 1 && (from[0] + 1 == to[0] || from[0] == to[0] + 1)){
                 // check if square is empty
                 if(board.checkPosition(to))
@@ -82,11 +86,12 @@ public class Pawn extends Piece{
                         //this.position = to;
                         return true;
                     }
+                if(board.getEnPassant().position[0] == to[0] && board.getEnPassant().position[1] == to[1] + 1){
+                    return true;
+                }
                 return false;
             }
         }
-
-
         return false;
     }
     @Override

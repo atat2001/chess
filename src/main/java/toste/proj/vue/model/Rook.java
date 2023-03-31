@@ -59,4 +59,8 @@ public class Rook extends Piece{
                 '}';
     }
 
+    @Override
+    public char type(){
+        return 'R';
+    }
 }
