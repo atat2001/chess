@@ -6,6 +6,7 @@ import toste.proj.vue.model.Game;
 
 @RestController
 @RequestMapping("/api/chess")
+@CrossOrigin("http://localhost:8081/")
 public class ChessController{
     private Game game;
 
@@ -30,5 +31,9 @@ public class ChessController{
         }
         return diferenceY+diferenceX;*/
         return 0;
+    }
+    @GetMapping("/position")
+    public String getPosition(){
+        return game.toString();
     }
 }
