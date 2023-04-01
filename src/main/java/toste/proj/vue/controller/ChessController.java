@@ -34,6 +34,6 @@ public class ChessController{
     }
     @GetMapping("/position")
     public String getPosition(){
-        return game.toString();
+        return game.toFen().toString();
     }
 }

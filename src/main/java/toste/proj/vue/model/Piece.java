@@ -133,6 +133,11 @@ public class Piece {
     public char type(){
         return 'p';
     }
+    public String posToAn(){
+        char col = 'a';
+        col = (char)(col + position[0] - 1);
+        return new String(Character.toString(col).concat(Integer.toString(position[1])));
+    }
 
     @Override
     public String toString() {

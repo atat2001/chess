@@ -234,7 +234,7 @@ public class Board {
         }
         System.out.println(aux);
     }
-    // returns {}
+    // returns {long castle?, short castle?}
     public boolean[] castleRights(boolean isWhite){
         return new boolean[]{(isWhite && castleW[0] && castleW[1]) || (!isWhite && castleB[0] && castleB[1]) , (isWhite && castleW[2] && castleW[1]) || (!isWhite && castleB[2] && castleB[1])};
     }
@@ -359,5 +359,42 @@ public class Board {
             default:
                 return new Queen(this,pos,isWhite);
         }
+    }
+    public String toFen(){
+        Integer empty = 0;
+        int i;
+        String returner = "";
+        for(int z = 0;z<64; z++){
+            i = (8-(z / 8))*8 - 8 + (z % 8);
+            if(z % 8 == 0 && z != 0){
+                if(empty != 0){
+                    returner = returner.concat(empty.toString());
+                    empty = 0;
+                }
+                returner = returner.concat("/");
+            }
+            if(pieceList.get(i) != null){
+                if(empty != 0){
+                    returner = returner.concat(empty.toString());
+                    empty = 0;
+                }
+                if(pieceList.get(i).isWhite()){
+                    returner = returner.concat(Character.valueOf(Character.toUpperCase(pieceList.get(i).type())).toString());
+                }
+                else{
+                    returner = returner.concat(Character.valueOf(Character.toLowerCase(pieceList.get(i).type())).toString());
+                }
+            }
+            else{
+                empty += 1;
+            }
+        }
+        if(enPassant == null){
+            returner = returner.concat(" -");
+        }
+        else{
+            returner = returner.concat(enPassant.posToAn());
+        }
+        return returner;
     }
 }

@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import toste.proj.vue.model.Board;
 import toste.proj.vue.model.Game;
-import toste.proj.vue.model.Parser;
+import toste.proj.vue.util.Parser;
 import java.io.File;  // Import the File class
 import java.io.FileNotFoundException;   // Import this class to handle errors
 import java.util.Scanner; // Import the Scanner class to read text files
@@ -18,13 +18,14 @@ public class VueApplication {
 		Game game = new Game();
 
 		System.out.println(game.toString());
+		System.out.println(game.toFen());
 		Parser parser = new Parser();
 		try{
-		File myObj = new File("pgn.txt");
-		Scanner myReader = new Scanner(myObj);
-
-
 		SpringApplication.run(VueApplication.class, args);
+
+		} catch (Exception e) {
+		e.printStackTrace();
+		}/*
 		Character a = 'a';
 		String input;
 		int w = 5;
@@ -47,14 +48,10 @@ public class VueApplication {
 			}
 			System.out.println(parser.toString());
 		}
-		} catch (FileNotFoundException e) {
-			System.out.println("An error occurred.");
-			e.printStackTrace();
-		}
 		System.out.println(game.move(parser.getMoves()));
 		System.out.println(game.toString());
-	}
-
+	}*/
+}
 }
 /*String move = "";
 		Character a = 'a';

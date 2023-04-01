@@ -1,4 +1,4 @@
-package toste.proj.vue.model;
+package toste.proj.vue.util;
 import java.util.ArrayList;
 
 public class Parser {

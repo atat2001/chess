@@ -1,5 +1,7 @@
 package toste.proj.vue.model;
 
+import toste.proj.vue.dto.Fen;
+
 import javax.print.DocFlavor;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ public class Game {
 
     private int savedMove = 0;
 
+    // turn
     private boolean isWhite = true;
     public Game(){
         board = new Board();
@@ -413,5 +416,39 @@ public class Game {
 
     public String toString(){
         return board.toString();
+    }
+    public Fen toFen(){
+
+        String fenPosition = board.toFen().split(" ")[0].concat(" ");
+        String fenCurrentMove;
+        // current move
+        if(isWhite){
+            fenCurrentMove = "w ";
+        }
+         else{
+            fenCurrentMove = "b ";
+        }
+        String fenCastle = "";
+        if(board.castleRights(true)[1]){
+            fenCastle = fenCastle.concat("K");
+        }
+        if(board.castleRights(true)[0]){
+            fenCastle = fenCastle.concat("Q");
+        }
+        if(board.castleRights(false)[1]){
+            fenCastle = fenCastle.concat("k");
+        }
+        if(board.castleRights(false)[0]){
+            fenCastle = fenCastle.concat("q");
+        }
+        if(fenCastle.equals("")){
+            fenCastle = "-";
+        }
+        fenCastle = fenCastle.concat(" ");
+        String fenEnPassant = board.toFen().split(" ")[1];
+
+        return new Fen(fenPosition.concat(fenCurrentMove.concat(fenCastle.concat(fenEnPassant))));
+        // castle rights
+
     }
 }
