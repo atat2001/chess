@@ -4,6 +4,8 @@ import toste.proj.vue.dto.Fen;
 
 import javax.print.DocFlavor;
 import java.io.IOException;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -45,6 +47,96 @@ public class Game {
         board.addPiece(new int[]{8, 8}, 'r',false);
         kingW = (King)board.getPosition(new int[]{5, 1});
         kingB = (King)board.getPosition(new int[]{5, 8});
+    }
+
+    public Game(Fen aux){
+        board = new Board();
+        CharacterIterator it = new StringCharacterIterator(aux.position);
+        int row = 8;
+        int col = 1;
+        // Iterate and print current character
+        while (it.current() != CharacterIterator.DONE) {
+
+            System.out.println(row + " " + col);
+            System.out.println(it.current());
+            switch(it.current()){
+                case 'p':
+                    board.addPiece(new int[]{col, row}, 'p',false);
+                    col++;
+                    it.next();
+                    break;
+                case 'P':
+                    board.addPiece(new int[]{col, row}, 'p',true);
+                    col++;
+                    it.next();
+                    break;
+                case 'k':
+                    board.addPiece(new int[]{col, row}, 'k',false);
+                    kingB = (King)board.getPosition(new int[]{5, 8});
+                    col++;
+                    it.next();
+                    break;
+                case 'K':
+                    board.addPiece(new int[]{col, row}, 'k',true);
+                    kingW = (King)board.getPosition(new int[]{col, row});
+                    col++;
+                    it.next();
+                    break;
+                case 'n':
+                    board.addPiece(new int[]{col, row}, 'h',false);
+                    col++;
+                    it.next();
+                    break;
+                case 'N':
+                    board.addPiece(new int[]{col, row}, 'h',true);
+                    col++;
+                    it.next();
+                    break;
+                case 'r':
+                    board.addPiece(new int[]{col, row}, 'r',false);
+                    col++;
+                    it.next();
+                    break;
+                case 'R':
+                    board.addPiece(new int[]{col, row}, 'r',true);
+                    col++;
+                    it.next();
+                    break;
+                case 'b':
+                    board.addPiece(new int[]{col, row}, 'b',false);
+                    col++;
+                    it.next();
+                    break;
+                case 'B':
+                    board.addPiece(new int[]{col, row}, 'b',true);
+                    col++;
+                    it.next();
+                    break;
+                case 'q':
+                    board.addPiece(new int[]{col, row}, 'q',false);
+                    col++;
+                    it.next();
+                    break;
+                case 'Q':
+                    board.addPiece(new int[]{col, row}, 'q',true);
+                    col++;
+                    it.next();
+                    break;
+                case '/':
+                    col = 1;
+                    row +=-1;
+                    it.next();
+                    break;
+                default:
+                    col = col + Character.getNumericValue(it.current());
+                    it.next();
+                    break;
+            }
+        }
+    }
+    
+    public Game(String fen){
+        this(new Fen(fen));
     }
 
     public boolean move(String move){
@@ -418,7 +510,6 @@ public class Game {
         return board.toString();
     }
     public Fen toFen(){
-
         String fenPosition = board.toFen().split(" ")[0].concat(" ");
         String fenCurrentMove;
         // current move
@@ -451,4 +542,5 @@ public class Game {
         // castle rights
 
     }
+
 }

@@ -3,10 +3,10 @@ package toste.proj.vue.dto;
 import java.util.Arrays;
 
 public class Fen {
-    private String position;
-    private boolean isWhite;
-    private boolean[] castle;
-    private int[] enPassant;
+    public String position;
+    public boolean isWhite;
+    public boolean[] castle;
+    public int[] enPassant;
     // ignoring this 2 becouse they are useless for my app
     private int halfMove;
     private int fullMove;

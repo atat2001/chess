@@ -16,8 +16,6 @@ public class VueApplication {
 
 	public static void main(String[] args) {
 		Game game = new Game();
-
-		System.out.println(game.toString());
 		System.out.println(game.toFen());
 		Parser parser = new Parser();
 		try{
@@ -25,7 +23,14 @@ public class VueApplication {
 
 		} catch (Exception e) {
 		e.printStackTrace();
-		}/*
+		}
+		Scanner myObj = new Scanner(System.in);  // Create a Scanner object
+		System.out.println("Enter fen");
+
+		String fen = myObj.nextLine();
+		Game game2 = new Game(fen);
+		System.out.println(game2.toFen());
+		/*
 		Character a = 'a';
 		String input;
 		int w = 5;
