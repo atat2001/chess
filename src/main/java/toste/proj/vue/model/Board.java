@@ -53,6 +53,9 @@ public class Board {
             Piece toBackup = pieceList.get(convertIndex(to));
             pieceList.set(convertIndex(to), pieceList.get(convertIndex(from)));
             pieceList.get(convertIndex(to)).setPosition(to);
+            pieceList.set(convertIndex(from), null);
+            //System.out.println("checking if in check - " + isWhite);
+            //System.out.println(checkCheck(isWhite));
             if(checkCheck(isWhite)){
                 pieceList.set(convertIndex(from), fromBackup);
                 fromBackup.setPosition(from);
@@ -72,7 +75,7 @@ public class Board {
             //System.out.println(to[0]);
             //System.out.println(to[1]);
             //System.out.println(pieceList.get(convertIndex(from)));
-            //System.out.println("move not possible3");
+            System.out.println("move not possible3");
             return false;
         }
     }
@@ -393,6 +396,7 @@ public class Board {
             returner = returner.concat(" -");
         }
         else{
+            returner = returner.concat(" ");
             returner = returner.concat(enPassant.posToAn());
         }
         return returner;

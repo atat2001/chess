@@ -121,8 +121,11 @@ public class King extends Piece {
             int[] aux = new int[]{from[0] + v, from[1] - v};
             if (board.getPosition(aux) != null &&  (board.getPosition(aux) instanceof Bishop || board.getPosition(aux) instanceof Queen)  && board.getPosition(aux).isWhite() != this.isWhite)
                 return true;
-            if (board.getPosition(aux) != null)
+
+            if (board.getPosition(aux) != null){
+                // System.out.println(board.getPosition(aux));
                 break;
+            }
             v--;
         }
         return false;
