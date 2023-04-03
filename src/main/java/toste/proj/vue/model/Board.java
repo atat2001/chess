@@ -81,6 +81,7 @@ public class Board {
     }
     public boolean move(int[] from, int[] to, boolean isWhite, char... promotionType) {
         boolean debug = true;
+        pieceList.get(convertIndex(from)).getPossibleMoves();
         if(!checkMove(from, to, isWhite)) {
             System.out.println("debug board move 0");
             return false;

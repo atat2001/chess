@@ -146,4 +146,8 @@ public class Piece {
                 ", isWhite=" + isWhite +
                 '}';
     }
+
+    public int[][] getPossibleMoves(){
+        return null;
+    }
 }

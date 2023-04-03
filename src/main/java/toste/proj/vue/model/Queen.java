@@ -2,6 +2,7 @@ package toste.proj.vue.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class Queen extends Piece{
     public Queen(Board board, int[] position, boolean isWhite){
@@ -90,6 +91,155 @@ public class Queen extends Piece{
     @Override
     public char type(){
         return 'Q';
+    }
+    @Override
+    public int[][] getPossibleMoves(){
+        int[][] bishop = getPossibleBishopMoves();
+        int[][] rook = getPossibleRookMoves();
+        int[][] queen = new int[bishop.length + rook.length][2];
+        int index = 0;
+        for(int[] e: bishop){
+            queen[index++] = e;
+        }
+        for(int[] e: rook){
+            queen[index++] = e;
+        }
+        System.out.println("queen from " + this.position[0] + "," + this.position[1] + "moves: ");
+        for(int[] e: queen){
+            System.out.print(e[0] + "," + e[1] + " - ");
+        }
+        return queen;
+    }
+    public int[][] getPossibleRookMoves(){
+        int[][] returner = new int[16][2];
+        int current_moves = 0;
+        int[] from = {this.position[0], this.position[1]};
+        int v = 1;
+        while(this.position[0] + v != 9){
+            int[] aux = new int[]{from[0] + v, from[1]};
+            if (board.getPosition(aux) != null){
+                if(board.getPosition(aux).isWhite() != this.isWhite && board.checkMove(this.position, aux, this.isWhite))
+                    returner[current_moves++] = aux;
+                break;
+            }
+            if (board.getPosition(aux) == null && board.checkMove(this.position, aux, this.isWhite)){
+                returner[current_moves++] = aux;
+            }
+            v++;
+        }
+        v = -1;
+        while(this.position[0] + v != 0){
+            int[] aux = new int[]{from[0] + v, from[1]};
+            if (board.getPosition(aux) != null){
+                if(board.getPosition(aux).isWhite() != this.isWhite && board.checkMove(this.position, aux, this.isWhite))
+                    returner[current_moves++] = aux;
+                break;
+            }
+            if (board.getPosition(aux) == null && board.checkMove(this.position, aux, this.isWhite)){
+                returner[current_moves++] = aux;
+            }
+            v--;
+        }
+        v = 1;
+
+        while(this.position[1] + v != 9){
+            int[] aux = new int[]{from[0], v + from[1]};
+            if (board.getPosition(aux) != null){
+                if(board.getPosition(aux).isWhite() != this.isWhite && board.checkMove(this.position, aux, this.isWhite))
+                    returner[current_moves++] = aux;
+                break;
+            }
+            if (board.getPosition(aux) == null && board.checkMove(this.position, aux, this.isWhite)){
+                returner[current_moves++] = aux;
+            }
+            v++;
+        }
+        v = -1;
+        while(this.position[1] + v != 0){
+            int[] aux = new int[]{from[0], v + from[1]};
+            if (board.getPosition(aux) != null){
+                if(board.getPosition(aux).isWhite() != this.isWhite && board.checkMove(this.position, aux, this.isWhite))
+                    returner[current_moves++] = aux;
+                break;
+            }
+            if (board.getPosition(aux) == null && board.checkMove(this.position, aux, this.isWhite)){
+                returner[current_moves++] = aux;
+            }
+            v--;
+        }
+        // removes rest of list(was easier if i used arraylist but too late)
+        int[][] aux = returner;
+        returner = new int[current_moves][2];
+        while(current_moves != 0){
+            current_moves--;
+            returner[current_moves] = aux[current_moves];
+        }
+        return returner;
+    }
+    public int[][] getPossibleBishopMoves(){
+        int[][] returner = new int[13][2];
+        int current_moves = 0;
+        int[] from = {this.position[0], this.position[1]};
+        int v = 1;
+        while(this.position[0] + v != 9 && this.position[1] + v != 9){
+            int[] aux = new int[]{from[0] + v, from[1] + v};
+            if (board.getPosition(aux) != null){
+                if(board.getPosition(aux).isWhite() != this.isWhite && board.checkMove(this.position, aux, this.isWhite))
+                    returner[current_moves++] = aux;
+                break;
+            }
+            if (board.getPosition(aux) == null && board.checkMove(this.position, aux, this.isWhite)){
+                returner[current_moves++] = aux;
+            }
+            v++;
+        }
+        v = -1;
+        while((this.position[0] + v)*(this.position[1] + v) != 0){
+            int[] aux = new int[]{from[0] + v, from[1] + v};
+            if (board.getPosition(aux) != null){
+                if(board.getPosition(aux).isWhite() != this.isWhite && board.checkMove(this.position, aux, this.isWhite))
+                    returner[current_moves++] = aux;
+                break;
+            }
+            if (board.getPosition(aux) == null && board.checkMove(this.position, aux, this.isWhite)){
+                returner[current_moves++] = aux;
+            }
+            v--;
+        }
+        v = 1;
+        while(this.position[0] + v != 9 && this.position[1] - v != 0){
+            int[] aux = new int[]{from[0] + v, from[1] - v};
+            if (board.getPosition(aux) != null){
+                if(board.getPosition(aux).isWhite() != this.isWhite && board.checkMove(this.position, aux, this.isWhite))
+                    returner[current_moves++] = aux;
+                break;
+            }
+            if (board.getPosition(aux) == null && board.checkMove(this.position, aux, this.isWhite)){
+                returner[current_moves++] = aux;
+            }
+            v++;
+        }
+        v = -1;
+        while((this.position[0] + v) != 0 && (this.position[1] - v) != 9){
+            int[] aux = new int[]{from[0] + v, from[1] - v};
+            if (board.getPosition(aux) != null){
+                if(board.getPosition(aux).isWhite() != this.isWhite && board.checkMove(this.position, aux, this.isWhite))
+                    returner[current_moves++] = aux;
+                break;
+            }
+            if (board.getPosition(aux) == null && board.checkMove(this.position, aux, this.isWhite)){
+                returner[current_moves++] = aux;
+            }
+            v--;
+        }
+        // removes rest of list(was easier if i used arraylist but too late)
+        int[][] aux = returner;
+        returner = new int[current_moves][2];
+        while(current_moves != 0){
+            current_moves--;
+            returner[current_moves] = aux[current_moves];
+        }
+        return returner;
     }
 
 }

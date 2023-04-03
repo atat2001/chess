@@ -20,7 +20,7 @@ public class Pawn extends Piece{
         System.out.println(Arrays.toString(this.position));*/
         int[] from = {this.position[0], this.position[1]};
 
-        // en passant
+
         if(this.isWhite() && from[1] == 2){
             if(to[0] == from[0] && 4 == to[1]){
                 // check if square is empty
@@ -41,7 +41,7 @@ public class Pawn extends Piece{
                 return true;
             }
         }
-
+        System.out.println(this.position[0] + " " + to[0]);
         // white move and capture
         if(this.isWhite()){
             // regular move
@@ -86,7 +86,8 @@ public class Pawn extends Piece{
                         //this.position = to;
                         return true;
                     }
-                if(board.getEnPassant().position[0] == to[0] && board.getEnPassant().position[1] == to[1] + 1){
+
+                if(board.getEnPassant() != null && board.getEnPassant().position[0] == to[0] && board.getEnPassant().position[1] == to[1] + 1){
                     return true;
                 }
                 return false;
@@ -101,6 +102,34 @@ public class Pawn extends Piece{
                 ", isWhite=" + isWhite +
                 " p " +
                 '}';
+    }
+
+    @Override
+    public int[][] getPossibleMoves(){
+        int[][] returner = new int[4][2];
+        int current_moves = 0;
+        int[][] possible_moves;
+        if(isWhite)
+            possible_moves = new int[][]{{this.position[0] + 1, this.position[1] + 1}, {this.position[0] - 1, this.position[1] + 1}, {this.position[0], this.position[1] + 1}, {this.position[0], this.position[1] + 2}};
+        else
+            possible_moves = new int[][]{{this.position[0] + 1, this.position[1] - 1}, {this.position[0] - 1, this.position[1] - 1}, {this.position[0], this.position[1] - 1}, {this.position[0], this.position[1] - 2}};
+        for(int[] possible_move: possible_moves){
+            if(board.checkMove(this.position, possible_move, this.isWhite)){
+                returner[current_moves++] = possible_move;
+            }
+        }
+        int[][] aux = returner;
+        returner = new int[current_moves][2];
+        while(current_moves != 0){
+            current_moves--;
+            returner[current_moves] = aux[current_moves];
+        }
+        System.out.println("Pawn from " + this.position[0] + "," + this.position[1] + "moves: ");
+        for(int[] e: returner){
+            System.out.print(e[0] + "," + e[1] + " - ");
+
+        }
+        return returner;
     }
 
 }

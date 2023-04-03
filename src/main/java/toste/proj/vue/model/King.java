@@ -10,7 +10,7 @@ public class King extends Piece {
 
     @Override
     public boolean move(int[] to, boolean isWhite){
-        boolean debug = true;
+        boolean debug = false;
         if(this.isWhite != isWhite){
             return false;
         }
@@ -178,5 +178,33 @@ public class King extends Piece {
     public char type(){
         return 'K';
     }
+    @Override
+    public int[][] getPossibleMoves(){
+        int[][] returner = new int[8][2];
+        int current_moves = 0;
+        for(int x: new int[]{0,1,-1}){
+            for(int y: new int[]{0,1,-1}){
+                if(y == 0 && x == 0){
+                    continue;
+                }
+                int[] possible_move = new int[]{this.position[0] + x, this.position[1] + y};
+                if(board.checkMove(this.position, possible_move, this.isWhite))
+                    returner[current_moves++] = possible_move;
+            }
+        }
+        int[][] aux = returner;
+        returner = new int[current_moves][2];
+        while(current_moves != 0){
+            current_moves--;
+            returner[current_moves] = aux[current_moves];
+        }
+        System.out.println("King from " + this.position[0] + "," + this.position[1] + "moves: ");
+        for(int[] e: returner){
+            System.out.print(e[0] + "," + e[1] + " - ");
+
+        }
+        return returner;
+    }
+
 
 }

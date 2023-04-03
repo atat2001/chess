@@ -63,4 +63,76 @@ public class Rook extends Piece{
     public char type(){
         return 'R';
     }
+    @Override
+    public int[][] getPossibleMoves(){
+        int[][] returner = new int[16][2];
+        int current_moves = 0;
+        int[] from = {this.position[0], this.position[1]};
+        int v = 1;
+        while(this.position[0] + v != 9){
+            int[] aux = new int[]{from[0] + v, from[1]};
+            if (board.getPosition(aux) != null){
+                if(board.getPosition(aux).isWhite() != this.isWhite && board.checkMove(this.position, aux, this.isWhite))
+                    returner[current_moves++] = aux;
+                break;
+            }
+            if (board.getPosition(aux) == null && board.checkMove(this.position, aux, this.isWhite)){
+                returner[current_moves++] = aux;
+            }
+            v++;
+        }
+        v = -1;
+        while(this.position[0] + v != 0){
+            int[] aux = new int[]{from[0] + v, from[1]};
+            if (board.getPosition(aux) != null){
+                if(board.getPosition(aux).isWhite() != this.isWhite && board.checkMove(this.position, aux, this.isWhite))
+                    returner[current_moves++] = aux;
+                break;
+            }
+            if (board.getPosition(aux) == null && board.checkMove(this.position, aux, this.isWhite)){
+                returner[current_moves++] = aux;
+            }
+            v--;
+        }
+        v = 1;
+
+        while(this.position[1] + v != 9){
+            int[] aux = new int[]{from[0], v + from[1]};
+            if (board.getPosition(aux) != null){
+                if(board.getPosition(aux).isWhite() != this.isWhite && board.checkMove(this.position, aux, this.isWhite))
+                    returner[current_moves++] = aux;
+                break;
+            }
+            if (board.getPosition(aux) == null && board.checkMove(this.position, aux, this.isWhite)){
+                returner[current_moves++] = aux;
+            }
+            v++;
+        }
+        v = -1;
+        while(this.position[1] + v != 0){
+            int[] aux = new int[]{from[0], v + from[1]};
+            if (board.getPosition(aux) != null){
+                if(board.getPosition(aux).isWhite() != this.isWhite && board.checkMove(this.position, aux, this.isWhite))
+                    returner[current_moves++] = aux;
+                break;
+            }
+            if (board.getPosition(aux) == null && board.checkMove(this.position, aux, this.isWhite)){
+                returner[current_moves++] = aux;
+            }
+            v--;
+        }
+        // removes rest of list(was easier if i used arraylist but too late)
+        int[][] aux = returner;
+        returner = new int[current_moves][2];
+        while(current_moves != 0){
+            current_moves--;
+            returner[current_moves] = aux[current_moves];
+        }
+
+        System.out.println("Rook from " + this.position[0] + "," + this.position[1] + "moves: ");
+        for(int[] e: returner){
+            System.out.print(e[0] + "," + e[1] + " - ");
+        }
+        return returner;
+    }
 }

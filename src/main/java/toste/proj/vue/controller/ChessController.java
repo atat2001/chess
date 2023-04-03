@@ -44,9 +44,16 @@ public class ChessController{
         return 0;
     }
     @CrossOrigin("http://localhost:8081")
-
     @GetMapping("/position")
     public Fen getPosition(){
         return game.toFen();
     }
+
+    @CrossOrigin("http://localhost:8081")
+    @GetMapping("/getMoves")
+    public int[] getMoves(@RequestBody Move move){
+        return null;
+    }
+
+
 }
