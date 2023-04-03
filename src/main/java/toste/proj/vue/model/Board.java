@@ -402,4 +402,7 @@ public class Board {
         }
         return returner;
     }
+    public int[][] getPossibleMoves(int[] pos){
+        return pieceList.get(convertIndex(pos)).getPossibleMoves();
+    }
 }

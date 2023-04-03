@@ -340,15 +340,18 @@ public class Game {
 
     }
 
-    public boolean saveMove(int move){
+    public int saveMove(int move){
         if(savedMove == 0) {
+            if(this.getPossibleMoves(move).length == 0){
+                return 0;
+            }
             savedMove = move;
-            return true;
+            return 2;
         }
         else {
             int moveSaved = savedMove;
             savedMove = 0;
-            return move(moveSaved / 10, moveSaved % 10, move / 10, move % 10);
+            return move(moveSaved / 10, moveSaved % 10, move / 10, move % 10)? 1:0;
         }
     }
 
@@ -541,6 +544,14 @@ public class Game {
         return new Fen(fenPosition.concat(fenCurrentMove.concat(fenCastle.concat(fenEnPassant))));
         // castle rights
 
+    }
+
+    public int[][] getPossibleMoves(int move){
+        int[] pos = new int[]{move / 10,move % 10};
+        if(board.getPosition(pos) != null && board.getPosition(pos).isWhite != isWhite){
+            return null;
+        }
+        return board.getPossibleMoves(pos);
     }
 
 }

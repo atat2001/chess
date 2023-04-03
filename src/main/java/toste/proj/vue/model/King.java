@@ -16,9 +16,13 @@ public class King extends Piece {
         }
         int x = to[0] - this.position[0];
         int y = to[1] - this.position[1];
+        if(board.checkPosition(to) && board.getPosition(to).isWhite == this.isWhite){
+            return false;
+        }
         if(!(x > 1 || x < -1 || y > 1 || y < -1))
             return true;
         boolean[] aux = board.castleRights(isWhite);
+
         if(to[0] == this.position[0] + 2 && aux[1]){
             if(debug)
                 System.out.println("king move 1");

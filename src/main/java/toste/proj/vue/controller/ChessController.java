@@ -7,6 +7,7 @@ import toste.proj.vue.dto.Fen;
 import toste.proj.vue.model.Game;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 
 
 @RestController
@@ -33,15 +34,39 @@ public class ChessController{
         Move(){
         }
     }
+    public static class MoveResponse{
+        public int selected;
+        public int[] possibleMoves;
+        MoveResponse(){
+        }
+    }
     @CrossOrigin("http://localhost:8081")
 
-    @PostMapping("/move")
-    public int move(@RequestBody Move move) {
-        System.out.println(move.move);
-        if(game.saveMove((int)move.move)){
-            return 1;
+    @PutMapping("/move")
+    public MoveResponse move(@RequestBody Move move) {
+        //System.out.println(move.move);
+        MoveResponse returner = new MoveResponse();
+        switch(game.saveMove((int)move.move)){
+            case 1:
+                returner.selected = move.move;
+                return returner;
+            case 2:
+                returner.selected = move.move;
+                int[][] aux =game.getPossibleMoves(move.move);
+                if(aux == null){
+                    return null;
+                }
+                int[] possibleMovesList = new int[aux.length];
+                int index = 0;
+                for(int[] e: aux){
+                    possibleMovesList[index++] = e[0] * 10 + e[1];
+                }
+                returner.possibleMoves = possibleMovesList;
+                return returner;
+            case 0:
+                return null;
         }
-        return 0;
+        return null;
     }
     @CrossOrigin("http://localhost:8081")
     @GetMapping("/position")
