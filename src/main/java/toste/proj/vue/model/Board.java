@@ -1,14 +1,19 @@
 package toste.proj.vue.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class Board {
     //private Hashtable<int[], Piece> pieceList = new Hashtable<>();
     private List<Piece> pieceList = new ArrayList<Piece>(64);
     private King kingW;
     private King kingB;
+
+    private int checkMate = 0;
 
     private Pawn enPassant;
     private boolean[] castleW = {true, true, true};
@@ -41,11 +46,16 @@ public class Board {
     }
 
     public boolean checkMove(int[] from, int[] to, boolean isWhite){
+        boolean debug = false;
+        if(from[0] < 1 || to[0] < 1 || from[0] > 9 || to[0] > 9 || from[1] < 1 || to[1] < 1 || from[1] > 9 || to[1] > 9 ){
+            if(debug){
+            System.out.println("move not possible0");}
+            return false;
+        }
 
         if(convertIndex(from) < 0 || convertIndex(from) > 63 || pieceList.get(convertIndex(from)) == null || convertIndex(to) < 0 || convertIndex(to) > 63){
-            //System.out.println(convertIndex(from));
-            //System.out.println(convertIndex(to));
-            System.out.println("move not possible");
+            if(debug){
+            System.out.println("move not possible");}
             return false;
         }
         if((pieceList.get(convertIndex(from))).move(to, isWhite)){
@@ -54,36 +64,38 @@ public class Board {
             pieceList.set(convertIndex(to), pieceList.get(convertIndex(from)));
             pieceList.get(convertIndex(to)).setPosition(to);
             pieceList.set(convertIndex(from), null);
-            //System.out.println("checking if in check - " + isWhite);
-            //System.out.println(checkCheck(isWhite));
             if(checkCheck(isWhite)){
                 pieceList.set(convertIndex(from), fromBackup);
                 fromBackup.setPosition(from);
                 pieceList.set(convertIndex(to), toBackup);
-                System.out.println("move not possible2");
+                if(debug){
+                System.out.println("move not possible2");}
                 return false;
             }
             pieceList.set(convertIndex(from), fromBackup);
             pieceList.set(convertIndex(to), toBackup);
             fromBackup.setPosition(from);
-            System.out.println("Move possible");
+            if(debug){
+            System.out.println("Move possible");}
             return true;
         }
         else{
-            //System.out.println(from[0]);
-            //System.out.println(from[1]);
-            //System.out.println(to[0]);
-            //System.out.println(to[1]);
-            //System.out.println(pieceList.get(convertIndex(from)));
-            System.out.println("move not possible3");
+            if(debug){
+            System.out.println("move not possible3");}
             return false;
         }
     }
     public boolean move(int[] from, int[] to, boolean isWhite, char... promotionType) {
         boolean debug = true;
+        if(debug){
+            System.out.println(from[0] + " " + from[1]);
+            System.out.println(to[0] + " " + to[1]);
+            System.out.println(pieceList.get(convertIndex(from)));
+        }
         pieceList.get(convertIndex(from)).getPossibleMoves();
         if(!checkMove(from, to, isWhite)) {
-            System.out.println("debug board move 0");
+            if(debug){
+            System.out.println("debug board move 0");}
             return false;
         }
         // depois fazer com for
@@ -142,14 +154,16 @@ public class Board {
         }
         //
         if(pieceList.get(convertIndex(from)) instanceof Pawn && ((to[1] == 1 && !pieceList.get(convertIndex(from)).isWhite()) || (to[1] == 8 && pieceList.get(convertIndex(from)).isWhite()))){
-            pieceList.set(convertIndex(to),this.getPromotionPiece(to, pieceList.get(convertIndex(from)).isWhite(), promotionType[0]));
+            if(promotionType == null){
+                return false;
+            }
+            this.addPiece(to,promotionType[0], pieceList.get(convertIndex(from)).isWhite());
         }
         else{
             pieceList.set(convertIndex(to), pieceList.get(convertIndex(from)));
         }
         pieceList.get(convertIndex(to)).setPosition(to);
         pieceList.set(convertIndex(from), null);
-        //System.out.println((Math.abs(from[1] - to[1]) == 2 && pieceList.get(convertIndex(to)) instanceof Pawn? 1:0));
         if (Math.abs(from[1] - to[1]) == 2 && pieceList.get(convertIndex(to)) instanceof Pawn) {
             enPassant = (Pawn)pieceList.get(convertIndex(to));
         }
@@ -205,7 +219,6 @@ public class Board {
 
     // da set ao castle right index index ao boolean a
     public void setCastle(boolean isWhite, boolean a,int index){
-        // System.out.println("changing casle iswhite, a, index" + isWhite + a + index);
         if(isWhite) {
             if(index ==0)
                 castleW[0] = castleW[0] && a;
@@ -236,7 +249,6 @@ public class Board {
                     aux += 1;
             }
         }
-        System.out.println(aux);
     }
     // returns {long castle?, short castle?}
     public boolean[] castleRights(boolean isWhite){
@@ -398,11 +410,33 @@ public class Board {
         }
         else{
             returner = returner.concat(" ");
-            returner = returner.concat(enPassant.posToAn());
+            String pos = enPassant.posToAn();
+            // en passant is the square behind the pawn that moved 2 pieces
+            pos = pos.replace(pos.charAt(1),(char)(pos.charAt(1) - (enPassant.isWhite()?1:-1)));
+            returner = returner.concat(pos);
         }
         return returner;
     }
     public int[][] getPossibleMoves(int[] pos){
-        return pieceList.get(convertIndex(pos)).getPossibleMoves();
+        if(pieceList.get(convertIndex(pos)) != null)
+            return pieceList.get(convertIndex(pos)).getPossibleMoves();
+        return null;
+    }
+    public boolean checkmate(boolean isWhite){
+        for(Piece e: pieceList){
+            if(e == null)
+                continue;
+            if(e.getPossibleMoves() != null && e.isWhite() == isWhite && e.getPossibleMoves().length != 0)
+                return false;
+        }
+        return true;
+    }
+    public void setEnPassant(int x, int y){
+        if(this.getPosition(new int[]{x,y}) != null && this.getPosition(new int[]{x,y}) instanceof Pawn){
+            this.enPassant = (Pawn)this.getPosition(new int[]{x,y});
+        }
+        else{
+            System.out.println("error setenpassant");
+        }
     }
 }

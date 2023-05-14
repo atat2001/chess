@@ -2,6 +2,7 @@ package toste.proj.vue;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import toste.proj.vue.model.Board;
 import toste.proj.vue.model.Game;
 import toste.proj.vue.util.Parser;
@@ -12,24 +13,27 @@ import java.util.Scanner; // Import the Scanner class to read text files
 import java.io.Console;
 
 @SpringBootApplication
+@EnableJpaRepositories("toste.proj.vue.model")
 public class VueApplication {
 
 	public static void main(String[] args) {
-		Game game = new Game();
+		/*Game game = new Game();
 		System.out.println(game.toFen());
-		Parser parser = new Parser();
-		try{
-		SpringApplication.run(VueApplication.class, args);
+		Parser parser = new Parser();*/
+		/*try{*/
 
+		SpringApplication.run(VueApplication.class, args);
+		/*
 		} catch (Exception e) {
 		e.printStackTrace();
-		}
+		}*/
+			/*
 		Scanner myObj = new Scanner(System.in);  // Create a Scanner object
 		System.out.println("Enter fen");
 
 		String fen = myObj.nextLine();
 		Game game2 = new Game(fen);
-		System.out.println(game2.toFen());
+		System.out.println(game2.toFen());*/
 		/*
 		Character a = 'a';
 		String input;
@@ -56,7 +60,7 @@ public class VueApplication {
 		System.out.println(game.move(parser.getMoves()));
 		System.out.println(game.toString());
 	}*/
-}
+	}
 }
 /*String move = "";
 		Character a = 'a';

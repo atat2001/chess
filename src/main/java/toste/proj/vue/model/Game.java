@@ -1,29 +1,49 @@
 package toste.proj.vue.model;
 
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import toste.proj.vue.controller.ChessController;
 import toste.proj.vue.dto.Fen;
+import toste.proj.vue.dto.MoveResponse;
 
+import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.print.DocFlavor;
 import java.io.IOException;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
+@Entity
+@Table
 public class Game {
-    private String boardPgn;
+    @Transient
+    private ArrayList<Fen> positionsList;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+    @ElementCollection
+    public List<Integer> movelist = new ArrayList<>();
+    @OneToOne(cascade = {CascadeType.ALL})
+    public Fen startingPos;
+    @Transient
     public Board board;
-    private int w = 1;
+    @Transient
     private King kingW;
+    @Transient
     private King kingB;
-
-
+    @Transient
     private int savedMove = 0;
-
     // turn
+    @Transient
     private boolean isWhite = true;
+    public Game(List<Integer> movelist, Fen startingPos){
+        this.movelist = movelist;
+        this.startingPos = startingPos;
+        this.loadGame();
+    }
     public Game(){
         board = new Board();
+        positionsList = new ArrayList<>();
         for(int e = 1; e < 9; e++) {
             board.addPiece(new int[]{e, 2}, 'p',true);
             board.addPiece(new int[]{e, 7}, 'p',false);
@@ -47,92 +67,12 @@ public class Game {
         board.addPiece(new int[]{8, 8}, 'r',false);
         kingW = (King)board.getPosition(new int[]{5, 1});
         kingB = (King)board.getPosition(new int[]{5, 8});
+        positionsList.add(this.toFen());
+        this.startingPos = this.toFen();
     }
 
     public Game(Fen aux){
-        board = new Board();
-        CharacterIterator it = new StringCharacterIterator(aux.position);
-        int row = 8;
-        int col = 1;
-        // Iterate and print current character
-        while (it.current() != CharacterIterator.DONE) {
-
-            System.out.println(row + " " + col);
-            System.out.println(it.current());
-            switch(it.current()){
-                case 'p':
-                    board.addPiece(new int[]{col, row}, 'p',false);
-                    col++;
-                    it.next();
-                    break;
-                case 'P':
-                    board.addPiece(new int[]{col, row}, 'p',true);
-                    col++;
-                    it.next();
-                    break;
-                case 'k':
-                    board.addPiece(new int[]{col, row}, 'k',false);
-                    kingB = (King)board.getPosition(new int[]{5, 8});
-                    col++;
-                    it.next();
-                    break;
-                case 'K':
-                    board.addPiece(new int[]{col, row}, 'k',true);
-                    kingW = (King)board.getPosition(new int[]{col, row});
-                    col++;
-                    it.next();
-                    break;
-                case 'n':
-                    board.addPiece(new int[]{col, row}, 'h',false);
-                    col++;
-                    it.next();
-                    break;
-                case 'N':
-                    board.addPiece(new int[]{col, row}, 'h',true);
-                    col++;
-                    it.next();
-                    break;
-                case 'r':
-                    board.addPiece(new int[]{col, row}, 'r',false);
-                    col++;
-                    it.next();
-                    break;
-                case 'R':
-                    board.addPiece(new int[]{col, row}, 'r',true);
-                    col++;
-                    it.next();
-                    break;
-                case 'b':
-                    board.addPiece(new int[]{col, row}, 'b',false);
-                    col++;
-                    it.next();
-                    break;
-                case 'B':
-                    board.addPiece(new int[]{col, row}, 'b',true);
-                    col++;
-                    it.next();
-                    break;
-                case 'q':
-                    board.addPiece(new int[]{col, row}, 'q',false);
-                    col++;
-                    it.next();
-                    break;
-                case 'Q':
-                    board.addPiece(new int[]{col, row}, 'q',true);
-                    col++;
-                    it.next();
-                    break;
-                case '/':
-                    col = 1;
-                    row +=-1;
-                    it.next();
-                    break;
-                default:
-                    col = col + Character.getNumericValue(it.current());
-                    it.next();
-                    break;
-            }
-        }
+        this.loadFen(aux);
     }
     
     public Game(String fen){
@@ -143,21 +83,24 @@ public class Game {
         int[][] aux = lanToPos(move);
         int[] from = aux[0];
         int[] to = aux[1];
-        /*System.out.println(from[0]);
+        boolean debug = false;
+        if(debug){
+        System.out.println(from[0]);
         System.out.println(from[1]);
         System.out.println(to[0]);
-        System.out.println(to[1]);*/
+        System.out.println(to[1]);}
 
         if(board.move(from, to, isWhite)) {
             isWhite = !isWhite;
+            positionsList.add(this.toFen());
+            movelist.add(from[0]);
+            movelist.add(from[1]);
+            movelist.add(to[0]);
+            movelist.add(to[1]);
+            movelist.add(0);
             return true;
         }
         return false;
-        /*System.out.println("is king black in check?");
-        System.out.println(kingB.isCheck());
-        System.out.println("is king white in check?");
-        System.out.println(kingW.isCheck());
-        System.out.println("\n");*/
     }
 
     public boolean move(ArrayList<String[]> move){
@@ -165,7 +108,9 @@ public class Game {
             if(e[1].equals("")){
                 return this.move(anToPos(e[0]));
             }
-            System.out.println("moving " + e[0] + ", " + e[1]);
+            boolean debug = false;
+            if(debug){
+            System.out.println("moving " + e[0] + ", " + e[1]);}
             if((!this.move(anToPos(e[0]))) || (!this.move(anToPos(e[1])))){
                 return false;
             }
@@ -177,52 +122,73 @@ public class Game {
         int[] to = aux[1];
         if(aux.length == 3){
             if(board.move(from, to, isWhite, (char)aux[2][0])) {
+                positionsList.add(this.toFen());
+                movelist.add(from[0]);
+                movelist.add(from[1]);
+                movelist.add(to[0]);
+                movelist.add(to[1]);
+                movelist.add(0);
                 isWhite = !isWhite;
                 return true;
             }
             return false;
         }
-        /*System.out.println(from[0]);
+        boolean debug = false;
+        if(debug){System.out.println(from[0]);
         System.out.println(from[1]);
         System.out.println(to[0]);
-        System.out.println(to[1]);*/
+        System.out.println(to[1]);}
 
         if(board.move(from, to, isWhite)) {
+            positionsList.add(this.toFen());
+            movelist.add(from[0]);
+            movelist.add(from[1]);
+            movelist.add(to[0]);
+            movelist.add(to[1]);
+            movelist.add(0);
             isWhite = !isWhite;
             return true;
         }
         return false;
-        /*System.out.println("is king black in check?");
-        System.out.println(kingB.isCheck());
-        System.out.println("is king white in check?");
-        System.out.println(kingW.isCheck());
-        System.out.println("\n");*/
     }
-    public boolean move(int x1, int y1, int x2, int y2){
+    public boolean move(int x1, int y1, int x2, int y2,  char... promotionType){
         int[] from = new int[]{x1,y1};
         int[] to = new int[]{x2,y2};
-        /*System.out.println(from[0]);
+        boolean debug = false;
+        if(debug){System.out.println(from[0]);
         System.out.println(from[1]);
         System.out.println(to[0]);
-        System.out.println(to[1]);*/
+        System.out.println(to[1]);}
 
-        if(board.move(from, to, isWhite)){
+        if(board.move(from, to, isWhite, promotionType)){
+            positionsList.add(this.toFen());
+            movelist.add(from[0]);
+            movelist.add(from[1]);
+            movelist.add(to[0]);
+            movelist.add(to[1]);
+            // asign a random char to move on with the code
+            if(promotionType == null){
+                promotionType = new char[]{'a'};
+            }
+            switch (promotionType[0]){
+                case 'r':
+                    movelist.add(1);
+                    break;
+                case 'h':
+                    movelist.add(2);
+                    break;
+                case 'b':
+                    movelist.add(3);
+                    break;
+                case 'q':
+                    movelist.add(4);
+                    break;
+                default:
+                    movelist.add(0);
+            }
             isWhite = !isWhite;
-            //System.out.println(this.toString());
             return true;
         }
-/*
-        System.out.println(x1);
-        System.out.println(y1);
-        System.out.println(x2);
-        System.out.println(y2);
-        System.out.println("\n");
-
-        System.out.println("is king black2 in check?");
-        System.out.println(kingB.isCheck());
-        System.out.println("is king white in check?");
-        System.out.println(kingW.isCheck());
-        System.out.println("\n");*/
         return false;
     }
 
@@ -340,9 +306,9 @@ public class Game {
 
     }
 
-    public int saveMove(int move){
+    public int saveMove(int move,  char... promotionType){
         if(savedMove == 0) {
-            if(this.getPossibleMoves(move).length == 0){
+            if(this.getPossibleMoves(move) == null){
                 return 0;
             }
             savedMove = move;
@@ -351,13 +317,17 @@ public class Game {
         else {
             int moveSaved = savedMove;
             savedMove = 0;
-            return move(moveSaved / 10, moveSaved % 10, move / 10, move % 10)? 1:0;
+            int aux = move(moveSaved / 10, moveSaved % 10, move / 10, move % 10, promotionType)? 1:0;
+            if(this.checkmate()){
+                return this.isWhite? 4:3;
+            }
+            return aux;
         }
     }
 
     // algebric notation(default notation on chess) to Pos
     public int[][] anToPos(String an){
-        boolean debug = true;
+        boolean debug = false;
         Piece[] pieces;
         int length = an.length();
         if(an.charAt(length-1) == '+' || an.charAt(length-1) == '#') {
@@ -366,7 +336,9 @@ public class Game {
         }
         if(an.charAt(0) == 'O'){
             // long castle2
+            if(debug){
             System.out.println("castle: " + an);
+            }
             if(an.length() > 4 && an.charAt(3) == '-'){
                 if(board.castleRights(isWhite)[0]){
                     if(isWhite)
@@ -486,12 +458,13 @@ public class Game {
                     }
                 }
                 int aux2 = to[1];
+                if(debug){
                 System.out.println("de:");
                 System.out.println( (aux2 - (isWhite? 1:-1)));
                 System.out.println(to[0]);
                 System.out.println("para:");
                 System.out.println(aux2);
-                System.out.println(to[0]);
+                System.out.println(to[0]);}
                 if(board.checkMove(new int[]{to[0], (aux2 - (isWhite? 1:-1))}, new int[]{to[0], aux2}, isWhite)){
                     if(an.charAt(length-2) == '='){
                         return new int[][]{{to[0],aux2-(isWhite? 1:-1)},{to[0], aux2},{an.charAt(length-1)}};
@@ -541,9 +514,17 @@ public class Game {
         fenCastle = fenCastle.concat(" ");
         String fenEnPassant = board.toFen().split(" ")[1];
 
-        return new Fen(fenPosition.concat(fenCurrentMove.concat(fenCastle.concat(fenEnPassant))));
-        // castle rights
+        Fen returner = new Fen(fenPosition.concat(fenCurrentMove.concat(fenCastle.concat(fenEnPassant))));
+        if(this.checkmate()){
+            if(this.isWhite){
+                returner.checkmateBlack = true;
+            }
+            else
+                returner.checkmateWhite = true;
+        }
 
+        return returner;
+        // castle rights
     }
 
     public int[][] getPossibleMoves(int move){
@@ -552,6 +533,255 @@ public class Game {
             return null;
         }
         return board.getPossibleMoves(pos);
+    }
+    public boolean checkmate(){
+        return board.checkmate(this.isWhite);
+    }
+    private void loadFen(Fen aux){
+        board = new Board();
+        positionsList = new ArrayList<>();
+        CharacterIterator it = new StringCharacterIterator(aux.position);
+        int row = 8;
+        int col = 1;
+        // Iterate and print current character
+        while (it.current() != CharacterIterator.DONE) {
+            switch(it.current()){
+                case 'p':
+                    board.addPiece(new int[]{col, row}, 'p',false);
+                    col++;
+                    it.next();
+                    break;
+                case 'P':
+                    board.addPiece(new int[]{col, row}, 'p',true);
+                    col++;
+                    it.next();
+                    break;
+                case 'k':
+                    board.addPiece(new int[]{col, row}, 'k',false);
+                    kingB = (King)board.getPosition(new int[]{5, 8});
+                    col++;
+                    it.next();
+                    break;
+                case 'K':
+                    board.addPiece(new int[]{col, row}, 'k',true);
+                    kingW = (King)board.getPosition(new int[]{col, row});
+                    col++;
+                    it.next();
+                    break;
+                case 'n':
+                    board.addPiece(new int[]{col, row}, 'h',false);
+                    col++;
+                    it.next();
+                    break;
+                case 'N':
+                    board.addPiece(new int[]{col, row}, 'h',true);
+                    col++;
+                    it.next();
+                    break;
+                case 'r':
+                    board.addPiece(new int[]{col, row}, 'r',false);
+                    col++;
+                    it.next();
+                    break;
+                case 'R':
+                    board.addPiece(new int[]{col, row}, 'r',true);
+                    col++;
+                    it.next();
+                    break;
+                case 'b':
+                    board.addPiece(new int[]{col, row}, 'b',false);
+                    col++;
+                    it.next();
+                    break;
+                case 'B':
+                    board.addPiece(new int[]{col, row}, 'b',true);
+                    col++;
+                    it.next();
+                    break;
+                case 'q':
+                    board.addPiece(new int[]{col, row}, 'q',false);
+                    col++;
+                    it.next();
+                    break;
+                case 'Q':
+                    board.addPiece(new int[]{col, row}, 'q',true);
+                    col++;
+                    it.next();
+                    break;
+                case '/':
+                    col = 1;
+                    row +=-1;
+                    it.next();
+                    break;
+                default:
+                    col = col + Character.getNumericValue(it.current());
+                    it.next();
+                    break;
+            }
+
+        }
+        // board.setCastle(boolean isWhite, boolean a,int index)
+        if(aux.castle.get(0)){
+            board.setCastle(true, true,0);
+
+            board.setCastle(true, true,1);
+        }
+        if(aux.castle.get(1)){
+            board.setCastle(true, true,1);
+
+            board.setCastle(true, true,2);
+        }
+        if(aux.castle.get(2)){
+            board.setCastle(false, true,0);
+
+            board.setCastle(false, true,1);
+        }
+        if(aux.castle.get(3)){
+            board.setCastle(false, true,1);
+
+            board.setCastle(false, true,2);
+        }
+        if(aux.enPassant != null && aux.enPassant.size() == 2){
+            int wasWhite = aux.enPassant.get(1) == 2?1:-1;
+            board.setEnPassant(aux.enPassant.get(0), aux.enPassant.get(1) + wasWhite);
+        }
+        positionsList.add(this.toFen());
+        this.startingPos = this.toFen();
+    }
+
+    public void undo(int undos){
+        if(positionsList.size() <= undos){
+            return;
+        }
+        boolean turn = isWhite;
+        while(undos > 0){
+            undos += -1;
+            turn = !turn;
+            positionsList.remove(positionsList.size()-1);
+            movelist.subList(0, movelist.size()-5);
+        }
+        ArrayList<Fen> aux = positionsList;
+        this.loadFen(positionsList.get(positionsList.size()-1));
+        this.positionsList = aux;
+        this.isWhite = turn;
+    }
+
+    public MoveResponse moveResponse(int move, int promotionType) {
+
+        MoveResponse returner = new MoveResponse();
+        char charPromotionType;
+        switch (promotionType) {
+            case 2:
+                charPromotionType = 'r';
+                break;
+            case 3:
+                charPromotionType = 'h';
+                break;
+            case 4:
+                charPromotionType = 'b';
+                break;
+            case 5:
+                charPromotionType = 'q';
+                break;
+            default:
+                charPromotionType = 'q';
+                break;
+        }
+        switch (this.saveMove(move, charPromotionType)) {
+            case 1:
+                returner.selected = move;
+                return returner;
+            case 2:
+                returner.selected = move;
+                int[][] aux = this.getPossibleMoves(move);
+                if (aux == null) {
+                    return null;
+                }
+                int[] possibleMovesList = new int[aux.length];
+                int index = 0;
+                for (int[] e : aux) {
+                    possibleMovesList[index++] = e[0] * 10 + e[1];
+                }
+                returner.possibleMoves = possibleMovesList;
+                return returner;
+            case 3:
+                returner.checkmateBlack = true;
+                return returner;
+            // white won
+            case 4:
+                // black won
+                returner.checkmateWhite = true;
+                return returner;
+            case 0:
+                return null;
+        }
+        return null;
+    }
+    public int getId(){
+        return this.id;
+    }
+    public void setId(int newId){
+        this.id = newId;
+    }
+    public boolean compareMoves(List<Integer> movelist ){
+        Iterator<Integer> aux = this.movelist.iterator();
+        for(Integer e: movelist){
+            if(aux.hasNext()){
+                if(e != aux.next()){
+                    return false;
+                }
+            }
+            else{
+                return false;
+            }
+        }
+        return !aux.hasNext();
+    }
+    // used to generate data that isnt stored in the database
+    public void loadGame(){
+        // load fen(starting position)
+        this.loadFen(this.startingPos);
+        this.loadMoves();
+    }
+    public void loadMoves(){
+        boolean debug = true;
+        List<Integer> list = new ArrayList<>(movelist);
+        movelist = new ArrayList<>();
+        Iterator<Integer> iter = list.iterator();
+        int x1, x2;
+        int y1, y2;
+        int promotion;
+        char aux;
+        while(iter.hasNext()){
+            x1 = iter.next();
+            y1 = iter.next();
+            x2 = iter.next();
+            y2 = iter.next();
+            promotion = iter.next();
+            switch (promotion){
+                case 1:
+                    aux = 'r';
+                    break;
+                case 2:
+                    aux = 'h';
+                    break;
+                case 3:
+                    aux = 'b';
+                    break;
+                case 4:
+                    aux = 'q';
+                    break;
+                default:
+                    aux = 'q';
+            }
+            if(debug)
+                System.out.println("loadMoves:" + " " + x1 +" " + y1 +" " + x2 + " " + y2 + " " + aux);
+            if(!this.move(x1,y1,x2,y2,new char[]{aux})){
+                if(debug){
+                System.out.println("Erro loadmoves");
+                }
+            }
+        }
     }
 
 }
