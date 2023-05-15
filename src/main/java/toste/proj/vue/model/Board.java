@@ -86,13 +86,14 @@ public class Board {
         }
     }
     public boolean move(int[] from, int[] to, boolean isWhite, char... promotionType) {
-        boolean debug = true;
+        boolean debug = false;
         if(debug){
+            System.out.println(this.toString());
             System.out.println(from[0] + " " + from[1]);
             System.out.println(to[0] + " " + to[1]);
             System.out.println(pieceList.get(convertIndex(from)));
         }
-        pieceList.get(convertIndex(from)).getPossibleMoves();
+        // pieceList.get(convertIndex(from)).getPossibleMoves();
         if(!checkMove(from, to, isWhite)) {
             if(debug){
             System.out.println("debug board move 0");}
@@ -167,7 +168,7 @@ public class Board {
         if (Math.abs(from[1] - to[1]) == 2 && pieceList.get(convertIndex(to)) instanceof Pawn) {
             enPassant = (Pawn)pieceList.get(convertIndex(to));
         }
-        else if (pieceList.get(convertIndex(from)) instanceof Pawn && enPassant != null && to[0] == enPassant.position[0] && to[1] + (isWhite? -1:+1) == enPassant.position[1]) {
+        else if (pieceList.get(convertIndex(to)) instanceof Pawn && enPassant != null && to[0] == enPassant.position[0] && to[1] + (isWhite? -1:+1) == enPassant.position[1]) {
             pieceList.set(convertIndex(enPassant.getPosition()), null);
             enPassant = null;
         } else

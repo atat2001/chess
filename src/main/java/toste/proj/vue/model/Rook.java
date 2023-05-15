@@ -128,10 +128,12 @@ public class Rook extends Piece{
             current_moves--;
             returner[current_moves] = aux[current_moves];
         }
-
+        boolean debug = false;
+        if(debug){
         System.out.println("Rook from " + this.position[0] + "," + this.position[1] + "moves: ");
         for(int[] e: returner){
             System.out.print(e[0] + "," + e[1] + " - ");
+        }
         }
         return returner;
     }

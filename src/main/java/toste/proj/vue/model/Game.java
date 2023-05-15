@@ -155,10 +155,12 @@ public class Game {
         int[] from = new int[]{x1,y1};
         int[] to = new int[]{x2,y2};
         boolean debug = false;
-        if(debug){System.out.println(from[0]);
-        System.out.println(from[1]);
-        System.out.println(to[0]);
-        System.out.println(to[1]);}
+        if(debug){
+            System.out.println(from[0]);
+            System.out.println(from[1]);
+            System.out.println(to[0]);
+            System.out.println(to[1]);
+        }
 
         if(board.move(from, to, isWhite, promotionType)){
             positionsList.add(this.toFen());
@@ -378,9 +380,6 @@ public class Game {
                         continue;
                     if(debug) {
                         System.out.println(e == null ? "null" : e.toString());
-                        //System.out.println((e != null ? e.getPosition()[0] + " " + e.getPosition()[1]: "null") + " filter: " + (filter == null ? "null": (filter - 96) + " " + (char)filter));
-                        //System.out.println(e != null? board.checkMove(e.getPosition(), to, isWhite) : "e == null");
-                        //System.out.println(filter == null);
                         if(e == null && e.getPosition() != null && filter != null) {
                             System.out.println(e.getPosition()[0]);
                             System.out.println(e.getPosition()[1]);
@@ -537,10 +536,13 @@ public class Game {
     public boolean checkmate(){
         return board.checkmate(this.isWhite);
     }
+
+    // loads fen as starting position
     private void loadFen(Fen aux){
         board = new Board();
         positionsList = new ArrayList<>();
         CharacterIterator it = new StringCharacterIterator(aux.position);
+        this.isWhite = aux.isWhite;
         int row = 8;
         int col = 1;
         // Iterate and print current character
@@ -618,7 +620,6 @@ public class Game {
                     it.next();
                     break;
             }
-
         }
         // board.setCastle(boolean isWhite, boolean a,int index)
         if(aux.castle.get(0)){
@@ -650,20 +651,16 @@ public class Game {
     }
 
     public void undo(int undos){
-        if(positionsList.size() <= undos){
+        if(positionsList.size() < undos){
             return;
         }
-        boolean turn = isWhite;
         while(undos > 0){
             undos += -1;
-            turn = !turn;
             positionsList.remove(positionsList.size()-1);
-            movelist.subList(0, movelist.size()-5);
+            movelist = movelist.subList(0, movelist.size()-5);
+            System.out.println("changed to size: " + movelist.size());
         }
-        ArrayList<Fen> aux = positionsList;
-        this.loadFen(positionsList.get(positionsList.size()-1));
-        this.positionsList = aux;
-        this.isWhite = turn;
+        this.loadGame();
     }
 
     public MoveResponse moveResponse(int move, int promotionType) {
@@ -744,8 +741,9 @@ public class Game {
         this.loadMoves();
     }
     public void loadMoves(){
-        boolean debug = true;
+        boolean debug = false;
         List<Integer> list = new ArrayList<>(movelist);
+        positionsList = new ArrayList<>();
         movelist = new ArrayList<>();
         Iterator<Integer> iter = list.iterator();
         int x1, x2;
@@ -779,9 +777,12 @@ public class Game {
             if(!this.move(x1,y1,x2,y2,new char[]{aux})){
                 if(debug){
                 System.out.println("Erro loadmoves");
+                return;
                 }
             }
         }
+        if(debug)
+            System.out.println("loadMoves: SUCCESS");
     }
 
 }

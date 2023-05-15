@@ -41,7 +41,6 @@ public class Pawn extends Piece{
                 return true;
             }
         }
-        System.out.println(this.position[0] + " " + to[0]);
         // white move and capture
         if(this.isWhite()){
             // regular move
@@ -124,11 +123,13 @@ public class Pawn extends Piece{
             current_moves--;
             returner[current_moves] = aux[current_moves];
         }
+        boolean debug = false;
+        if(debug){
         System.out.println("Pawn from " + this.position[0] + "," + this.position[1] + "moves: ");
         for(int[] e: returner){
             System.out.print(e[0] + "," + e[1] + " - ");
 
-        }
+        }}
         return returner;
     }
 

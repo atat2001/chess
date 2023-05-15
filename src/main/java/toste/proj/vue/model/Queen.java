@@ -104,10 +104,12 @@ public class Queen extends Piece{
         for(int[] e: rook){
             queen[index++] = e;
         }
+        boolean debug = false;
+        if(debug){
         System.out.println("queen from " + this.position[0] + "," + this.position[1] + "moves: ");
         for(int[] e: queen){
             System.out.print(e[0] + "," + e[1] + " - ");
-        }
+        }}
         return queen;
     }
     public int[][] getPossibleRookMoves(){
